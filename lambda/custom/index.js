@@ -8,27 +8,29 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to the Alexa Skills Kit, you can say hello!';
+    const speechText = 'Welcome to Dungeons! What is your name, Adventurer?';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .reprompt("Speak your name Adventurer.")
+      .withSimpleCard('Welcome', speechText)
       .getResponse();
   },
 };
 
-const HelloWorldIntentHandler = {
+const NameHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent';
+      && handlerInput.requestEnvelope.request.intent.name === 'NameIntent';
   },
   handle(handlerInput) {
-    const speechText = 'Hello World!';
+    var name = this.event.request.intent.slots.name.value;
+    const speechText = 'Welcome to the world ' + name + '! What is your race? You may be a human, a dwarf or an elf.';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .reprompt('What is your character\'s race?')
+      .withSimpleCard('Name Selection', speechText)
       .getResponse();
   },
 };
@@ -92,10 +94,14 @@ const ErrorHandler = {
 
 const skillBuilder = Alexa.SkillBuilders.custom();
 
+function diceRoll(sides){
+  return Math.floor((Math.random() * Math.floor(sides)) + 1)
+}
+
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
-    HelloWorldIntentHandler,
+    NameHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
