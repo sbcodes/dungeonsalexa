@@ -92,19 +92,17 @@ const ClassHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText =  '<speak>Okay, ' + char_class + ', we will now roll your stats. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'></audio>' +
+    const speechText =  '<speak>' + 
+                        'Okay, ' + char_class + ', we will now roll your stats. ' +
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\" />' +
                         'You rolled a ' + String.valueOf(stats[0]) + ' for strength. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'></audio>' +
                         'You rolled a ' + String.valueOf(stats[1]) + ' for dexterity. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'></audio>' +
                         'You rolled a ' + String.valueOf(stats[2]) + ' for constitution. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'></audio>' +
                         'You rolled a ' + String.valueOf(stats[3]) + ' for intelligence. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'></audio>' +
                         'You rolled a ' + String.valueOf(stats[4]) + ' for wisdom. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'></audio>' +
-                        'You rolled a ' + String.valueOf(stats[5]) + ' for charisma.</speak>';
+                        'You rolled a ' + String.valueOf(stats[5]) + ' for charisma. ' +
+                        'Adventurer, you have been tasked by the king to explore the dungeon.' + 
+                        '</speak>';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
