@@ -6,7 +6,7 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "38828d1ec58dec0f15dc3f56a18a0f90"
+          "eTag": "451c0bf8cda2accbb9234b13672a7d88"
         },
         "interactionModel": {
           "en-US": {
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-dungeons-alexa-default",
             "handler": "index.handler",
-            "revisionId": "e60b8511-8bbc-4301-b950-1c6a567cd7b7",
+            "revisionId": "bef10cb1-c72b-4cfa-8935-52d0ce2367fe",
             "runtime": "nodejs8.10"
           }
         ]

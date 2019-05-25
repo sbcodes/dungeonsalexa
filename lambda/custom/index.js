@@ -88,7 +88,7 @@ const ClassHandler = {
 
     // Ask for the class
     const speechText = 'Okay, we will now roll your stats.';
-    const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.class;
+    const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.char_class;
 
     return handlerInput.responseBuilder
       // Ask for the user's class
