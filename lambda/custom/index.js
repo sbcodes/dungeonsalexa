@@ -88,7 +88,7 @@ const ClassHandler = {
     attributes.char_class = char_class;
     // Roll the stats and save it into the attributes
     attributes.stats = rollStats(attributes, 6);  //cap to 7?
-
+    speechText = char_class;
     attributes.lastPos = 'entrance roll dice';
     attributes.PCHP = diceRoll(4) * attributes.stats[2];
     attributes.ogreAsleep = 1;
@@ -97,6 +97,7 @@ const ClassHandler = {
     attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
     attributes.hasKey = 0;
+    attributes.goblinAlive = 1;
     if(attributes.char_class === 'warrior'){
       attributes.damageDice = 6;
     } else{
@@ -106,14 +107,15 @@ const ClassHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
+    var test = 5;
     const speechText =  `<speak>
     Okay, ${name}, we will now roll your stats.
-    You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
-    a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. \n`;
+    You rolled a ${test} for strength, a ${test} for dexterity, a ${test} for constitution,
+    a ${test} for intelligence, a ${test} for wisdom, and a ${test} for charisma. \n`;
     
     const expositionText =  `You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
     The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
-    All maps have been lost but you are a brave ${attributes.char_class} and aren’t one to back down from a Challenge.
+    All maps have been lost but you are a brave ${test} and aren’t one to back down from a Challenge.
     Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
     Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
     As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
@@ -122,7 +124,7 @@ const ClassHandler = {
 
     return handlerInput.responseBuilder
       // Ask for the user's class
-      .speak(speechText + expositionText)
+      .speak(speechText)
       .getResponse();
   },
 };
@@ -177,72 +179,93 @@ const AttackHandler = {
     // Get the session attributes, get the name from the attributes
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
-    if (attributes.lastPos != 'left') {
+    if (attributes.lastPos != 'left' || attributes.lastPos != 'middle') {
       return handlerInput.responseBuilder
-      .speak('There is not ogre here to fight!')
-      .getResponse();
-    } else if(attributes.ogreAsleep === 1){
-      attributes.ogreAsleep = 0;
-      attributes.ogreStats = rollStats(4);
-      attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
-    } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
-      //ogre awake but not dead
-      //dex to dodge attacks
-      attributes.ogreStats = rollStats(6);
-      attributes.ogreHP = diceRoll(4) * attributes.ogreStats[0];
-    } else if(attributes.ogreAlive === 0){
-      //ogre dead
-      //return 
-      return handlerInput.responseBuilder
-      .speak('The ogre has already perished')
+      .speak('There is not enemy here to fight!')
       .getResponse();
     }
-    // var r = diceRoll(8);
-    // if(r >= attributes.ogreStats[1]){
-    //   //attack hits
-    //   var d = rollDice(attributes.damageDice);
-    //   speechText('Your attack hits for ' + d);
-    //   attributes.ogreHP - d;
-    // } else{
-    //   speechText('Your attack missed');
-    // }
-    // r = diceRoll(8);
-    // if(r >= attributes.ogreStats[1]){
-    //   //attack hits
-    //   var d = rollDice(attributes.damageDice);
-    //   speechText('Your attack hits for ' + d);
-    //   attributes.ogreHP - d;
-    // } else{
-    //   speechText('Your attack missed');
-    // }
-
-    //player attacks
-    var dam = attack(attributes);
-    if(dam > 0){
-      speechText = 'Your attack hits the ogre for ' + dam + ' damage';
-      attributes.ogreHP -= dam;
-    } else{
-      speechText = 'Your attack missed. ';
+    else if(attributes.lastPos === 'middle'){
+      if(attributes.ogreAsleep === 1){
+        attributes.ogreAsleep = 0;
+        attributes.ogreStats = rollStats(4);
+        attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
+      } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
+        //ogre awake but not dead
+        //dex to dodge attacks
+        attributes.ogreStats = rollStats(6);
+        attributes.ogreHP = diceRoll(4) * attributes.ogreStats[0];
+      } else if(attributes.ogreAlive === 0){
+        //ogre dead
+        //return 
+        return handlerInput.responseBuilder
+        .speak('The ogre has already perished')
+        .getResponse();
+      }
+  
+      //player attacks
+      var dam = attack(attributes);
+      if(dam > 0){
+        speechText = 'Your attack hits the ogre for ' + dam + ' damage';
+        attributes.ogreHP -= dam;
+      } else{
+        speechText = 'Your attack missed. ';
+      }
+      //enemy attacks
+      dam = oAttack(attributes);
+      if(dam > 0){
+        speechText = 'The Ogre hits you for ' + dam + ' damage. ';
+        attributes.PCHP -= dam;
+      } else{
+        speechText = 'The ogres attack whiffed. ';
+      }
+      if(attributes.ogreHP <= 0){
+        attributes.ogreAlive = 0;
+        handlerInput.attributesManager.setSessionAttributes(attributes);
+        speechText = 'The ogre is slain. ';
+        return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+      }
     }
-    //enemy attacks
-    dam = oAttack(attributes);
-    if(dam > 0){
-      speechText = 'The Ogre hits you for ' + dam + ' damage';
-      attributes.PCHP -= dam;
-    } else{
-      speechText = 'The ogres attack whiffed. ';
-    }
-    if(attributes.ogreHP <= 0){
-      attributes.ogreAlive = 0;
-      speechText = 'The ogre is slain. You have received a torch and ';
-      return handlerInput.responseBuilder
-      .speak(speechText)
-      .getResponse();
+    else if(attributes.lastPos === 'left'){
+      if(goblinAlive === 1){
+        attributes.goblinStats = rollStatsEnemy(3);
+        attributes.goblinHP = rollDice(2) * goblinStats[0];
+        //player attacks
+      var dam = attack(attributes);
+      if(dam > 0){
+        speechText = 'Your attack hits the goblin for ' + dam + ' damage';
+        attributes.goblinHP -= dam;
+      } else{
+        speechText = 'Your attack missed. ';
+      }
+      //enemy attacks
+      dam = oAttack(attributes);
+      if(dam > 0){
+        speechText = 'The goblin hits you for ' + dam + ' damage. ';
+        attributes.PCHP -= dam;
+      } else{
+        speechText = 'The goblin\'s attack whiffed. ';
+      }
+      if(attributes.goblinHP <= 0){
+        attributes.goblinAlive = 0;
+        handlerInput.attributesManager.setSessionAttributes(attributes);
+        speechText = 'The goblin is slain. ';
+        return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+      }
+      } else{
+        return handlerInput.responseBuilder
+        .speak('The goblin has already perished')
+        .getResponse();
+      }
+      
     }
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('Attack the ogre again or flee?')
+      .reprompt('Attack again or flee?')
       .getResponse();
   },
 };
