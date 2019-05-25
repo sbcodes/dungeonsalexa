@@ -96,6 +96,7 @@ const ClassHandler = {
     attributes.ogreDead = 0;
     attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
+    attributes.litTorch = 0;
     attributes.hasKey = 0;
     attributes.goblinAlive = 1;
     if(attributes.char_class === 'warrior'){
@@ -135,10 +136,10 @@ const ClassHandler = {
 //Potential move of ogre to dark hallway and small enemy to fight for torch
 
 //barebones
-const LeftHandler = {
+const MiddleHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'LeftIntent';
+      && handlerInput.requestEnvelope.request.intent.name === 'MiddleIntent';
   },
   handle(handlerInput) {
     // Get the session attributes, get the name from the attributes
@@ -146,26 +147,32 @@ const LeftHandler = {
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
       return handlerInput.responseBuilder
-      .speak('You can\'t go left now!')
-      .getResponse();
-    } else if(attributes.ogreAsleep === 1){
-      const speechText = 'You choose the left Path, as you walk down it the path leads to another circular room seemingly empty. ' +
-      'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
-      'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
-      attributes.lastPos = 'left';
-      
-    } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
-      //ogre awake but not dead
-      //dex to dodge attacks
-    } else if(attributes.ogreAlive === 0){
-      //ogre dead
-      //return 
-      attributes.lastPos = 'left'
-      handlerInput.attributesManager.setSessionAttributes(attributes);
-      return handlerInput.responseBuilder
-      .speak(speechText)
+      .speak('You can\'t go middle now!')
       .getResponse();
     }
+    if(attributes.litTorch === 1){
+      if(attributes.ogreAsleep === 1){
+        const speechText = 'You choose the middle Path, as you walk down it the path leads to another circular room seemingly empty. ' +
+        'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
+        'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
+        attributes.lastPos = 'left';
+        
+      } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
+        //ogre awake but not dead
+        //dex to dodge attacks
+      } else if(attributes.ogreAlive === 0){
+        //ogre dead
+        //return 
+        attributes.lastPos = 'left'
+        handlerInput.attributesManager.setSessionAttributes(attributes);
+        return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+      }
+    } else{
+      //too dark
+    }
+    
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -235,29 +242,30 @@ const AttackHandler = {
         attributes.goblinStats = rollStatsEnemy(3);
         attributes.goblinHP = rollDice(2) * goblinStats[0];
         //player attacks
-      var dam = attack(attributes);
-      if(dam > 0){
-        speechText = 'Your attack hits the goblin for ' + dam + ' damage';
-        attributes.goblinHP -= dam;
-      } else{
-        speechText = 'Your attack missed. ';
-      }
-      //enemy attacks
-      dam = oAttack(attributes);
-      if(dam > 0){
-        speechText = 'The goblin hits you for ' + dam + ' damage. ';
-        attributes.PCHP -= dam;
-      } else{
-        speechText = 'The goblin\'s attack whiffed. ';
-      }
-      if(attributes.goblinHP <= 0){
-        attributes.goblinAlive = 0;
-        handlerInput.attributesManager.setSessionAttributes(attributes);
-        speechText = 'The goblin is slain. ';
-        return handlerInput.responseBuilder
-        .speak(speechText)
-        .getResponse();
-      }
+        var dam = attack(attributes);
+        if(dam > 0){
+          speechText = 'Your attack hits the goblin for ' + dam + ' damage';
+          attributes.goblinHP -= dam;
+        } else{
+          speechText = 'Your attack missed. ';
+        }
+        //enemy attacks
+        dam = oAttack(attributes);
+        if(dam > 0){
+          speechText = 'The goblin hits you for ' + dam + ' damage. ';
+          attributes.PCHP -= dam;
+        } else{
+          speechText = 'The goblin\'s attack whiffed. ';
+        }
+        if(attributes.goblinHP <= 0){
+          attributes.goblinAlive = 0;
+          attributes.lastPos = 'goblin';
+          handlerInput.attributesManager.setSessionAttributes(attributes);
+          speechText = 'The goblin is slain. ';
+          return handlerInput.responseBuilder
+          .speak(speechText)
+          .getResponse();
+        }
       } else{
         return handlerInput.responseBuilder
         .speak('The goblin has already perished')
@@ -441,7 +449,7 @@ exports.handler = skillBuilder
     NameHandler,
     RaceHandler,
     ClassHandler,
-    LeftHandler,
+    MiddleHandler,
     AttackHandler,
     RightHandler,
     HelpIntentHandler,
