@@ -8,8 +8,7 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Dungeons! What is your name, Adventurer?';
-    
+    const speechText = '<speak>Welcome to Dungeons! What is your name Adventurer?</speak>';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -27,8 +26,8 @@ const NameHandler = {
   handle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     var name = request.intent.slots.name.value;
-    //save name into attributes
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    // Save name into attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
@@ -54,7 +53,7 @@ const RaceHandler = {
     const name = attributes.name;
 
     // Get the user's race from the utterance
-    var race = request.intent.slots.race.value;
+    var race = this.event.request.intent.slots.race.value;
 
     // Save the race into the attributes
     attributes.race = race;
@@ -89,7 +88,7 @@ const ClassHandler = {
     attributes.char_class = char_class;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    attributes = rollStats(attributes, 12);
+    attributes.stats = rollStats(attributes, 12);
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
@@ -187,7 +186,9 @@ function rollStats(attributes, diceSides){
     con--;
     str--;
   }
-  return attributes;
+
+  stats = [str, dex, con, int, wis, cha]
+  return stats;
 }
 
 // Roll a dice of n sides
