@@ -93,22 +93,24 @@ const ClassHandler = {
 
     // Ask for the class
     const speechText =  '<speak>Okay, ' + char_class + ', we will now roll your stats. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\"/>' +
                         'You rolled a ' + String.valueOf(stats[0]) + ' for strength. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\"/>' +
                         'You rolled a ' + String.valueOf(stats[1]) + ' for dexterity. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\"/>' +
                         'You rolled a ' + String.valueOf(stats[2]) + ' for constitution. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\"/>' +
                         'You rolled a ' + String.valueOf(stats[3]) + ' for intelligence. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\"/>' +
                         'You rolled a ' + String.valueOf(stats[4]) + ' for wisdom. ' +
-                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
-                        'You rolled a ' + String.valueOf(stats[5]) + ' for charisma.';
+                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\"/>' +
+                        'You rolled a ' + String.valueOf(stats[5]) + ' for charisma.</speak>';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
-      .speak(speechText);
+      .speak(speechText)
+      .getResponse();
+    
   },
 };
 
