@@ -97,13 +97,36 @@ const ClassHandler = {
     attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
     attributes.hasKey = 0;
+
     handlerInput.attributesManager.setSessionAttributes(attributes);
+
+    // Ask for the class
+    const speechText =  '<speak>' + 
+                        'Okay, ' + char_class + ', we will now roll your stats. ' +
+                        //'<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\" />' +
+                        'You rolled a something for strength. ' +
+                        'You rolled a something for dexterity. ' +
+                        'You rolled a something for constitution. ' +
+                        'You rolled a something for intelligence. ' +
+                        'You rolled a something for wisdom. ' +
+                        'You rolled a something for charisma. ' +
+                        'Adventurer, you have been tasked by the king to explore the dungeon. ';
 
     // const speechText =  `<speak>
     //                     Okay, ${name}, we will now roll your stats.
     //                     You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
     //                     a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. `
     
+    const expositionText =  'Adventurer you’ve been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Witch Queen Rosaline Blackwine the worst of her name' + 
+                            'The Witch Queens forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.' + 
+                            'All maps have been lost but you are a brave' + attributes.char_class + ' and aren’t one to back down from a Challenge. ' +
+                            'Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. ' +
+                            attributes.name + ' you arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around. ' +
+                            ' You take one look at the dark steps leading endlessly downwards into Darkness and step forward, dedicated in your quest to find the treasure. ' +
+                            'Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. ' +
+                            ' As you enter the dimly lit circular room, the light coming from a great fire up above. ' +
+                            'In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.' + 
+                            'As you’re about to choose you see a shadow across the right path. What do you do? </speak>';
     
     // const expositionText =  `You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
     //                         The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
@@ -111,7 +134,11 @@ const ClassHandler = {
     //                         Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
     //                         Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
     //                         As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
-    //                         As you’re about to choose you see a shadow across the right path. What do you do? </speak>`
+    //                         As you’re about to choose you see a shadow across the right path. What do you do? 
+    //                         </speak>`
+    
+    // For test                       
+    Console.log(speechText + expositionText)
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -198,6 +225,33 @@ const AttackHandler = {
   },
 };
 //Chest could have trap on it that requires a wisdom check to notice and dex to disarm.
+
+const RightHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'RightIntent';
+  },
+  handle(handlerInput) {
+    // Get the session attributes, get the name from the attributes
+    const lastPos = attributes.lastPos;
+    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
+      return handlerInput.responseBuilder
+      .speak('You can\'t go right now!')
+      .getResponse();
+    } else if(attributes.boulderPushed === 0){
+      // Boulder in the way user needs to move it
+    } else if(attributes.boulderPushed === 1){
+      // Boulder pushed go straight to the chest
+    }
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+    return handlerInput.responseBuilder
+      // Ask for the user's class
+      .speak(speechText)
+      .reprompt('Attack the ogre or flee?')
+      .getResponse();
+  },
+};
+
 const HelpIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
