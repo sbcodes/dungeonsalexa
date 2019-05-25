@@ -107,20 +107,50 @@ const ClassHandler = {
 
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
+    var test = ' Jamie ';
+
     // Text for speech
     const speechText =
-    `Okay, ${name}, we will now roll your stats.
+    `Okay, ${test}, we will now roll your stats.
 
-    You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
-    a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. 
+    You rolled a ${test} for strength, a ${test} for dexterity, a ${test} for constitution,
+    a ${test} for intelligence, a ${test} for wisdom, and a ${test} for charisma. 
 
     You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
     The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
-    All maps have been lost but you are a brave ${attributes.char_class} and aren’t one to back down from a Challenge.
+    All maps have been lost but you are a brave ${test} and aren’t one to back down from a Challenge.
     Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
     Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
     As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
     As you’re about to choose you see a shadow across the right path. What do you do?`;
+
+    // const speechText =
+    // `Okay, we will now roll your stats.
+
+    // You rolled a for strength, a for dexterity, a for constitution,
+    // a for intelligence, a for wisdom, and a for charisma. 
+
+    // You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
+    // The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
+    // All maps have been lost but you are a brave and aren’t one to back down from a Challenge.
+    // Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
+    // Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
+    // As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
+    // As you’re about to choose you see a shadow across the right path. What do you do?`;
+
+    // const speechText =
+    // `Okay, ${name}, we will now roll your stats.
+
+    // You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
+    // a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. 
+
+    // You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
+    // The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
+    // All maps have been lost but you are a brave ${attributes.char_class} and aren’t one to back down from a Challenge.
+    // Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
+    // Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
+    // As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
+    // As you’re about to choose you see a shadow across the right path. What do you do?`;
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -297,7 +327,9 @@ const RightHandler = {
                     Behind the boulder is a secret room. You notice an open chest in front of you.
                     Inside the chest, you find a golden key. Wondering what to do with it, you head back to the dungeon entrance to find a use for the key. 
                     Now where do you go? To the left, the middle, or the right?`;
+      // Set the correct attributes
       attributes.boulderPushed = 1;
+      attributes.hasKey = 1;
     } else if(attributes.boulderPushed === 1){
       speechText = `You have been here already found the mysterious key in the chest.`;
     }
