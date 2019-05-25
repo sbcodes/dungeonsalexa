@@ -8,8 +8,7 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Dungeons! What is your name, Adventurer?';
-    
+    const speechText = '<speak>Welcome to Dungeons! What is your name Adventurer?</speak>';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -54,7 +53,7 @@ const RaceHandler = {
     const name = attributes.name;
 
     // Get the user's race from the utterance
-    var race = request.intent.slots.race.value;
+    var race = this.event.request.intent.slots.race.value;
 
     // Save the race into the attributes
     attributes.race = race;
