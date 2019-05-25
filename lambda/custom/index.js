@@ -27,7 +27,7 @@ const NameHandler = {
     const request = handlerInput.requestEnvelope.request;
     var name = request.intent.slots.name.value;
     // Save name into attributes
-    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
@@ -53,14 +53,14 @@ const RaceHandler = {
     const name = attributes.name;
 
     // Get the user's race from the utterance
-    var race = this.event.request.intent.slots.race.value;
+    var race = request.intent.slots.race.value;
 
     // Save the race into the attributes
     attributes.race = race;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText = 'What class are you,' + name + '? Are you a rogue, or a warrior?';
+    const speechText = 'What class are you,' + name + ' the ' + race + '? Are you a rogue, or a warrior?';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
