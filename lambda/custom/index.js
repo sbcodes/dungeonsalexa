@@ -86,18 +86,18 @@ const ClassHandler = {
 
     // Save the race into the attributes
     attributes.char_class = char_class;
-    handlerInput.attributesManager.setSessionAttributes(attributes);
 
     attributes.stats = rollStats(attributes, 12);
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText = 'Okay, we will now roll your stats.';
+    const speechText = 'Okay, we will now roll your stats. ';
     const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.char_class;
 
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText + dataText)
+      .getResponse();
   },
 };
 
