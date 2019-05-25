@@ -12,7 +12,7 @@ const LaunchRequestHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt("Speak your name Adventurer.")
+      .reprompt("Speak your name Adventurer. ")
       .withSimpleCard('Welcome', speechText)
       .getResponse();
   },
@@ -31,11 +31,11 @@ const NameHandler = {
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    const speechText = 'Welcome to the world ' + name + '! What is your race? Are you a human, a dwarf, or an elf.';
+    const speechText = 'Welcome to the Fantasy Land ' + name + '! What is your race? Are you a human, a dwarf, or an elf. ';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('What is your character\'s race?')
+      .reprompt('What is your character\'s race? ')
       .withSimpleCard('Name Selection', speechText)
       .getResponse();
   },
@@ -87,7 +87,7 @@ const ClassHandler = {
     // Save the race into the attributes
     attributes.char_class = char_class;
     // Roll the stats and save it into the attributes
-    attributes.stats = rollStats(attributes, 12);
+    attributes.stats = rollStats(6);  //cap to 7?
 
     attributes.lastPos = 'entrance roll dice';
     attributes.PCHP = diceRoll(4) * attributes.stats[2];
@@ -98,33 +98,11 @@ const ClassHandler = {
     attributes.hasKey = 0;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    // Ask for the class
-    // const speechText =  '<speak>' + 
-    //                     'Okay, ' + char_class + ', we will now roll your stats. ' +
-    //                     //'<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\" />' +
-    //                     'You rolled a %d for strength. ' +
-    //                     'You rolled a %d for dexterity. ' +
-    //                     'You rolled a %d for constitution. ' +
-    //                     'You rolled a %d for intelligence. ' +
-    //                     'You rolled a %d for wisdom. ' +
-    //                     'You rolled a %d for charisma. ' +
-    //                     'Adventurer, you have been tasked by the king to explore the dungeon. ';
-
     const speechText =  `<speak>
                         Okay, ${name}, we will now roll your stats.
                         You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
-                        a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma.`
+                        a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. `
     
-    // const expositionText =  'Adventurer you’ve been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Witch Queen Rosaline Blackwine the worst of her name' + 
-    //                         'The Witch Queens forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.' + 
-    //                         'All maps have been lost but you are a brave' + attributes.char_class + ' and aren’t one to back down from a Challenge. ' +
-    //                         'Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. ' +
-    //                         attributes.name + ' you arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around. ' +
-    //                         ' You take one look at the dark steps leading endlessly downwards into Darkness and step forward, dedicated in your quest to find the treasure. ' +
-    //                         'Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. ' +
-    //                         ' As you enter the dimly lit circular room, the light coming from a great fire up above. ' +
-    //                         'In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.' + 
-    //                         'As you’re about to choose you see a shadow across the right path. What do you do? </speak>';
     
     const expositionText =  `You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
                             The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
@@ -141,6 +119,8 @@ const ClassHandler = {
   },
 };
 
+//Potential move of ogre to dark hallway and small enemy to fight for torch
+
 //barebones
 const LeftHandler = {
   canHandle(handlerInput) {
@@ -149,6 +129,7 @@ const LeftHandler = {
   },
   handle(handlerInput) {
     // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
       return handlerInput.responseBuilder
@@ -159,22 +140,26 @@ const LeftHandler = {
       'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
       'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
       attributes.ogreAsleep = 0;
-      //attributes.ogreStats = rollStats(attributes, 4)
-      //attributes.ogreHP = diceRoll(2) * attributes.ogreStats[2];
+      //attributes.ogreStats = rollStats(4);
+      //attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
     } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
       //ogre awake but not dead
+      //dex to dodge attacks
     } else if(attributes.ogreAlive === 0){
       //ogre dead
+      //return 
+      return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
     }
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
-      // Ask for the user's class
       .speak(speechText)
       .reprompt('Attack the ogre or flee?')
       .getResponse();
   },
 };
-
+//Chest could have trap on it that requires a wisdom check to notice and dex to disarm.
 const HelpIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -198,11 +183,12 @@ const CancelAndStopIntentHandler = {
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speechText = 'Goodbye!';
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const speechText = `Goodbye ${attributes.name}`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard('GOODBYE', speechText)
       .getResponse();
   },
 };
@@ -234,7 +220,7 @@ const ErrorHandler = {
 
 const skillBuilder = Alexa.SkillBuilders.custom();
 
-// Roll the user's stats
+// Roll the PC's stats
 function rollStats(attributes, diceSides){
   var str = diceRoll(diceSides);
   var dex = diceRoll(diceSides);
@@ -242,21 +228,20 @@ function rollStats(attributes, diceSides){
   var int = diceRoll(diceSides);
   var wis = diceRoll(diceSides);
   var cha = diceRoll(diceSides);
+  //rebalance
   if(attributes.race === 'Human'){
-    str++;
-    dex++;
-    con++;
-    int++;
-    wis++;
-    cha++;
-  } else if(attributes.race === 'Dwarf'){
-    str += 2;
-    con += 2;
+    con += 3;
+    int += 2;
     wis--;
+    cha--
+  } else if(attributes.race === 'Dwarf'){
+    str += 3;
+    con += 2;
+    dex--;
     cha--;
   } else if(attributes.race === 'Elf'){
-    dex += 2;
-    int += 2;
+    dex += 3;
+    wis += 2;
     con--;
     str--;
   }
@@ -265,15 +250,13 @@ function rollStats(attributes, diceSides){
   return stats;
 }
 
-function rollStatsEnemy(attributes, diceSides){
+//roll stats for monsters (no race bonus currently)
+function rollStatsEnemy(diceSides){
   var str = diceRoll(diceSides);
   var dex = diceRoll(diceSides);
-  var con = diceRoll(diceSides);
   var int = diceRoll(diceSides);
-  var wis = diceRoll(diceSides);
-  var cha = diceRoll(diceSides);
 
-  stats = [str, dex, con, int, wis, cha]
+  stats = [str, dex, int]
   return stats;
 }
 
@@ -288,6 +271,7 @@ exports.handler = skillBuilder
     NameHandler,
     RaceHandler,
     ClassHandler,
+    LeftHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
