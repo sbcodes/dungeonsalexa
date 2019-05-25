@@ -151,19 +151,16 @@ const MiddleHandler = {
         const speechText = 'You choose the middle Path, as you walk down it the path leads to another circular room seemingly empty. ' +
         'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
         'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
-        attributes.lastPos = 'left';
+        attributes.lastPos = 'middle';
         
       } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
         //ogre awake but not dead
         //dex to dodge attacks
       } else if(attributes.ogreAlive === 0){
         //ogre dead
-        //return 
-        attributes.lastPos = 'left'
-        handlerInput.attributesManager.setSessionAttributes(attributes);
-        return handlerInput.responseBuilder
-        .speak(speechText)
-        .getResponse();
+        //return
+        attributes.lastPos = 'middle'
+
       }
     } else{
       //too dark
@@ -228,6 +225,11 @@ const AttackHandler = {
         attributes.ogreAlive = 0;
         handlerInput.attributesManager.setSessionAttributes(attributes);
         speechText = 'The ogre is slain. ';
+        if(attributes.hasKey === 0){
+          speechText = 'You notice a door but it is locked.';
+        } else{
+          speechText = 'You notice a door and unlock it with your key. The End';
+        }
         return handlerInput.responseBuilder
         .speak(speechText)
         .getResponse();
