@@ -12,7 +12,7 @@ const LaunchRequestHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt("Speak your name Adventurer.")
+      .reprompt("Speak your name Adventurer. ")
       .withSimpleCard('Welcome', speechText)
       .getResponse();
   },
@@ -31,11 +31,11 @@ const NameHandler = {
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    const speechText = 'Welcome to the world ' + name + '! What is your race? Are you a human, a dwarf, or an elf.';
+    const speechText = 'Welcome to the Fantasy Land ' + name + '! What is your race? Are you a human, a dwarf, or an elf. ';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('What is your character\'s race?')
+      .reprompt('What is your character\'s race? ')
       .withSimpleCard('Name Selection', speechText)
       .getResponse();
   },
@@ -87,13 +87,14 @@ const ClassHandler = {
     // Save the race into the attributes
     attributes.char_class = char_class;
     // Roll the stats and save it into the attributes
-    attributes.stats = rollStats(attributes.race, 12);
+    attributes.stats = rollStats(6);  //cap to 7?
 
     attributes.lastPos = 'entrance roll dice';
     attributes.PCHP = diceRoll(4) * attributes.stats[2];
     attributes.ogreAsleep = 1;
     attributes.ogreAlive = 1;
     attributes.ogreDead = 0;
+    attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
     attributes.hasKey = 0;
 
@@ -121,6 +122,8 @@ const ClassHandler = {
   },
 };
 
+//Potential move of ogre to dark hallway and small enemy to fight for torch
+
 //barebones
 const LeftHandler = {
   canHandle(handlerInput) {
@@ -129,6 +132,7 @@ const LeftHandler = {
   },
   handle(handlerInput) {
     // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
       return handlerInput.responseBuilder
@@ -138,22 +142,64 @@ const LeftHandler = {
       const speechText = 'You choose the left Path, as you walk down it the path leads to another circular room seemingly empty. ' +
       'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
       'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
-      attributes.ogreAsleep = 0;
-      //attributes.ogreStats = rollStats(attributes, 4)
-      //attributes.ogreHP = diceRoll(2) * attributes.ogreStats[2];
+      attributes.lastPos = 'left';
+      
     } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
       //ogre awake but not dead
+      //dex to dodge attacks
     } else if(attributes.ogreAlive === 0){
       //ogre dead
+      //return 
+      attributes.lastPos = 'left'
+      handlerInput.attributesManager.setSessionAttributes(attributes);
+      return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
     }
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
-      // Ask for the user's class
       .speak(speechText)
       .reprompt('Attack the ogre or flee?')
       .getResponse();
   },
 };
+const AttackHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'AttackIntent';
+  },
+  handle(handlerInput) {
+    // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const lastPos = attributes.lastPos;
+    if (attributes.lastPos != 'left') {
+      return handlerInput.responseBuilder
+      .speak('You can\'t go left now!')
+      .getResponse();
+    } else if(attributes.ogreAsleep === 1){
+      attributes.ogreAsleep = 0;
+      attributes.ogreStats = rollStats(4);
+      attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
+    } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
+      //ogre awake but not dead
+      //dex to dodge attacks
+      attributes.ogreStats = rollStats(6);
+      attributes.ogreHP = diceRoll(4) * attributes.ogreStats[0];
+    } else if(attributes.ogreAlive === 0){
+      //ogre dead
+      //return 
+      return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+    }
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt('Attack the ogre again or flee?')
+      .getResponse();
+  },
+};
+//Chest could have trap on it that requires a wisdom check to notice and dex to disarm.
 
 const RightHandler = {
   canHandle(handlerInput) {
@@ -204,11 +250,12 @@ const CancelAndStopIntentHandler = {
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speechText = 'Goodbye!';
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const speechText = `Goodbye ${attributes.name}`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard('GOODBYE', speechText)
       .getResponse();
   },
 };
@@ -240,29 +287,28 @@ const ErrorHandler = {
 
 const skillBuilder = Alexa.SkillBuilders.custom();
 
-// Roll the user's stats
-function rollStats(race, diceSides){
+// Roll the PC's stats
+function rollStats(attributes, diceSides){
   var str = diceRoll(diceSides);
   var dex = diceRoll(diceSides);
   var con = diceRoll(diceSides);
   var int = diceRoll(diceSides);
   var wis = diceRoll(diceSides);
   var cha = diceRoll(diceSides);
-  if(race === 'Human'){
-    str++;
-    dex++;
-    con++;
-    int++;
-    wis++;
-    cha++;
-  } else if(race === 'Dwarf'){
-    str += 2;
-    con += 2;
-    wis--;
-    cha--;
-  } else if(race === 'Elf'){
-    dex += 2;
+  //rebalance
+  if(attributes.race === 'Human'){
+    con += 3;
     int += 2;
+    wis--;
+    cha--
+  } else if(attributes.race === 'Dwarf'){
+    str += 3;
+    con += 2;
+    dex--;
+    cha--;
+  } else if(attributes.race === 'Elf'){
+    dex += 3;
+    wis += 2;
     con--;
     str--;
   }
@@ -271,15 +317,13 @@ function rollStats(race, diceSides){
   return stats;
 }
 
-function rollStatsEnemy(attributes, diceSides){
+//roll stats for monsters (no race bonus currently)
+function rollStatsEnemy(diceSides){
   var str = diceRoll(diceSides);
   var dex = diceRoll(diceSides);
-  var con = diceRoll(diceSides);
   var int = diceRoll(diceSides);
-  var wis = diceRoll(diceSides);
-  var cha = diceRoll(diceSides);
 
-  stats = [str, dex, con, int, wis, cha]
+  stats = [str, dex, int]
   return stats;
 }
 
@@ -294,6 +338,8 @@ exports.handler = skillBuilder
     NameHandler,
     RaceHandler,
     ClassHandler,
+    LeftHandler,
+    AttackHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
