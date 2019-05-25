@@ -100,17 +100,15 @@ const ClassHandler = {
     // Ask for the class
     const speechText =  '<speak>' + 
                         'Okay, ' + char_class + ', we will now roll your stats. ' +
-                        '<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\" />' +
+                        //'<audio src=\"http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\" />' +
                         'You rolled a ' + String.valueOf(stats[0]) + ' for strength. ' +
                         'You rolled a ' + String.valueOf(stats[1]) + ' for dexterity. ' +
                         'You rolled a ' + String.valueOf(stats[2]) + ' for constitution. ' +
                         'You rolled a ' + String.valueOf(stats[3]) + ' for intelligence. ' +
                         'You rolled a ' + String.valueOf(stats[4]) + ' for wisdom. ' +
                         'You rolled a ' + String.valueOf(stats[5]) + ' for charisma. ' +
-                        'Adventurer, you have been tasked by the king to explore the dungeon.' + 
-                        '</speak>';
-    const expositionText =  '<speak>' +
-                            'Adventurer you’ve been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Witch Queen Rosaline Blackwine the worst of her name' + 
+                        'Adventurer, you have been tasked by the king to explore the dungeon.';
+    const expositionText =  'Adventurer you’ve been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Witch Queen Rosaline Blackwine the worst of her name' + 
                             'The Witch Queens forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.' + 
                             'All maps have been lost but you are a brave' + attributes.char_class + ' and aren’t one to back down from a Challenge.' +
                             'Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths.' +
@@ -137,12 +135,17 @@ const LeftHandler = {
   handle(handlerInput) {
     // Get the session attributes, get the name from the attributes
     const lastPos = attributes.lastPos;
-
-    
-    const speechText = 'You choose the left Path, as you walk down it the path leads to another circular room seemingly empty. ' +
-    'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
-    'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
-
+    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
+      return handlerInput.responseBuilder
+      .speak('You can\'t go left now!')
+      .getResponse();
+    } else if(attributes.ogreAsleep === 1){
+      const speechText = 'You choose the left Path, as you walk down it the path leads to another circular room seemingly empty. ' +
+      'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
+      'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
+      attributes.ogreAlive === 0;
+    }
+    handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
