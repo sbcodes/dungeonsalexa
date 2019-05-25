@@ -207,14 +207,15 @@ const RightHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'RightIntent';
   },
   handle(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     // Get the session attributes, get the name from the attributes
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
-      return handlerInput.responseBuilder
-      .speak('You can\'t go right now!')
-      .getResponse();
+      speechText = 'You can\'t go right now!';
     } else if(attributes.boulderPushed === 0){
-      // Boulder in the way user needs to move it
+      speechText = `You walk through the right corridor until you come accross a huge boulder blocking your path.
+                    Using your level ${attributes.stats[0]} strength, you push the boulder out of your way.
+                    Behind the boulder is a secret room. You notice an open chest in front of you. `;
     } else if(attributes.boulderPushed === 1){
       // Boulder pushed go straight to the chest
     }
@@ -222,7 +223,7 @@ const RightHandler = {
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
-      .reprompt('What do you do with the boulder?')
+      .reprompt('What do you do?')
       .getResponse();
   },
 };
