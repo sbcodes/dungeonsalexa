@@ -89,6 +89,12 @@ const ClassHandler = {
     // Roll the stats and save it into the attributes
     attributes.stats = rollStats(attributes, 12);
 
+    attributes.lastPos = 'entrance roll dice';
+    attributes.ogreAsleep = 1;
+    attributes.ogreAlive = 1;
+    attributes.ogreDead = 0;
+    attributes.hasTorch = 0;
+    attributes.hasKey = 0;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
@@ -114,7 +120,7 @@ const ClassHandler = {
                             ' As you enter the dimly lit circular room, the light coming from a great fire up above. ' +
                             'In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.' + 
                             'As you’re about to choose you see a shadow across the right path. What do you do?</speak>';
-
+    
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText + expositionText)
@@ -130,14 +136,17 @@ const LeftHandler = {
   },
   handle(handlerInput) {
     // Get the session attributes, get the name from the attributes
-    const request = handlerInput.requestEnvelope.request;
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const lastPos = attributes.lastPos;
+
+    
+    const speechText = 'You choose the left Path, as you walk down it the path leads to another circular room seemingly empty. ' +
+    'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
+    'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
-      .reprompt('What is your character\'s class? Rogue, or warrior?')
-      .withSimpleCard('Name Selection', speechText)
+      .reprompt('Attack the ogre or flee like the little bitch you are?')
       .getResponse();
   },
 };
