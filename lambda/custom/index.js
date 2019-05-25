@@ -61,7 +61,7 @@ const RaceHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText = 'What class are you,' + name + '? Are you a rogue, or a warrior?';
+    const speechText = 'What class are you,' + name + ' the ' + race + '? Are you a rogue, or a warrior?';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -83,7 +83,7 @@ const ClassHandler = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     // Get the user's race from the utterance
-    var char_class = request.intent.slots.class.value;
+    var char_class = request.intent.slots.char_class.value;
 
     // Save the race into the attributes
     attributes.char_class = char_class;
