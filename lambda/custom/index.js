@@ -41,6 +41,61 @@ const NameHandler = {
   },
 };
 
+const RaceHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'RaceIntent';
+  },
+  handle(handlerInput) {
+    // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    const name = attributes.name;
+
+    // Get the user's race from the utterance
+    var race = this.event.request.intent.slots.race.value;
+
+    // Save the race into the attributes
+    attributes.race = race;
+    handlerInput.attributeManager.setSessionAttributes(attributes);
+
+    // Ask for the class
+    const speechText = 'What class are you,' + name + '? Are you a rogue, or a warrior?';
+
+    return handlerInput.responseBuilder
+      // Ask for the user's class
+      .speak(speechText)
+      .reprompt('What is your character\'s class? Rogue, or warrior?')
+      .withSimpleCard('Name Selection', speechText)
+      .getResponse();
+  },
+};
+
+const ClassHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'ClassIntent';
+  },
+  handle(handlerInput) {
+    // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
+
+    // Get the user's race from the utterance
+    var char_class = this.event.request.intent.slots.class.value;
+
+    // Save the race into the attributes
+    attributes.char_class = char_class;
+    handlerInput.attributeManager.setSessionAttributes(attributes);
+
+    // Ask for the class
+    const speechText = 'Okay, we will now roll your stats.';
+    const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.class;
+
+    return handlerInput.responseBuilder
+      // Ask for the user's class
+      .speak(speechText + dataText)
+  },
+};
+
 const HelpIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -100,6 +155,12 @@ const ErrorHandler = {
 
 const skillBuilder = Alexa.SkillBuilders.custom();
 
+// Roll the user's stats
+function rollStats(){
+
+}
+
+// Roll a dice of n sides
 function diceRoll(sides){
   return Math.floor((Math.random() * Math.floor(sides)) + 1)
 }
@@ -108,6 +169,8 @@ exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
     NameHandler,
+    RaceHandler,
+    ClassHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
