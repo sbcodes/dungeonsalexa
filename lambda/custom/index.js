@@ -87,7 +87,7 @@ const ClassHandler = {
     // Save the race into the attributes
     attributes.char_class = char_class;
     // Roll the stats and save it into the attributes
-    attributes.stats = rollStats(6);  //cap to 7?
+    attributes.stats = rollStats(attributes, 6);  //cap to 7?
 
     attributes.lastPos = 'entrance roll dice';
     attributes.PCHP = diceRoll(4) * attributes.stats[2];
@@ -97,6 +97,11 @@ const ClassHandler = {
     attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
     attributes.hasKey = 0;
+    if(attributes.char_class === 'warrior'){
+      attributes.damageDice = 6;
+    } else{
+      attributes.damageDice = 4;
+    }
 
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
@@ -138,7 +143,7 @@ const ClassHandler = {
     //                         </speak>`
     
     // For test                       
-    Console.log(speechText + expositionText)
+    console.log(speechText + expositionText)
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -199,7 +204,7 @@ const AttackHandler = {
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'left') {
       return handlerInput.responseBuilder
-      .speak('You can\'t go left now!')
+      .speak('There is not ogre here to fight!')
       .getResponse();
     } else if(attributes.ogreAsleep === 1){
       attributes.ogreAsleep = 0;
@@ -213,6 +218,48 @@ const AttackHandler = {
     } else if(attributes.ogreAlive === 0){
       //ogre dead
       //return 
+      return handlerInput.responseBuilder
+      .speak('The ogre has already perished')
+      .getResponse();
+    }
+    // var r = diceRoll(8);
+    // if(r >= attributes.ogreStats[1]){
+    //   //attack hits
+    //   var d = rollDice(attributes.damageDice);
+    //   speechText('Your attack hits for ' + d);
+    //   attributes.ogreHP - d;
+    // } else{
+    //   speechText('Your attack missed');
+    // }
+    // r = diceRoll(8);
+    // if(r >= attributes.ogreStats[1]){
+    //   //attack hits
+    //   var d = rollDice(attributes.damageDice);
+    //   speechText('Your attack hits for ' + d);
+    //   attributes.ogreHP - d;
+    // } else{
+    //   speechText('Your attack missed');
+    // }
+
+    //player attacks
+    var dam = attack(attributes);
+    if(dam > 0){
+      speechText = 'Your attack hits the ogre for ' + dam + ' damage';
+      attributes.ogreHP -= dam;
+    } else{
+      speechText = 'Your attack missed. ';
+    }
+    //enemy attacks
+    dam = oAttack(attributes);
+    if(dam > 0){
+      speechText = 'The Ogre hits you for ' + dam + ' damage';
+      attributes.PCHP -= dam;
+    } else{
+      speechText = 'The ogres attack whiffed. ';
+    }
+    if(attributes.ogreHP <= 0){
+      attributes.ogreAlive = 0;
+      speechText = 'The ogre is slain. You have received a torch and ';
       return handlerInput.responseBuilder
       .speak(speechText)
       .getResponse();
@@ -357,6 +404,31 @@ function diceRoll(sides){
   return Math.floor((Math.random() * Math.floor(sides)) + 1)
 }
 
+function attack(attributes){
+  var d;
+  var r = rollDice(8);
+  if(r >= attributes.ogreStats[1]){
+    //attack hits
+    d = rollDice(attributes.damageDice);
+  } else{
+    //attack miss
+    d = 0;
+  }
+  return d;
+}
+function oAttack(attributes){
+  var d;
+  var r = rollDice(8);
+  if(r >= attributes.stats[1]){
+    //attack hits
+    d = rollDice(4);
+  } else{
+    //attack miss
+    d = 0;
+  }
+  return d;
+}
+
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
@@ -365,6 +437,7 @@ exports.handler = skillBuilder
     ClassHandler,
     LeftHandler,
     AttackHandler,
+    RightHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
