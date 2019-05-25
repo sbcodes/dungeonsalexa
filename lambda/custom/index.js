@@ -35,6 +35,34 @@ const NameHandler = {
   },
 };
 
+const RaceHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'RaceIntent';
+  },
+  handle(handlerInput) {
+    // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    const name = attributes.name;
+
+    // Get the user's race from the utterance
+    var race = this.event.request.intent.slots.race.value;
+
+    // Save the race into the attributes
+    attributes.race = race;
+    handlerInput.attributeManager.setSessionAttributes(attributes);
+
+    // Ask for the class
+    const speechText = 'What class are you,' + name + '? Are you rogue, or warrior?';
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt('What is your character\'s class?')
+      .withSimpleCard('Name Selection', speechText)
+      .getResponse();
+  },
+};
+
 const HelpIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
