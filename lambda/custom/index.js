@@ -94,23 +94,24 @@ const ClassHandler = {
     attributes.ogreAsleep = 1;
     attributes.ogreAlive = 1;
     attributes.ogreDead = 0;
+    attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
     attributes.hasKey = 0;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    const speechText =  `<speak>
-                        Okay, ${name}, we will now roll your stats.
-                        You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
-                        a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. `
+    // const speechText =  `<speak>
+    //                     Okay, ${name}, we will now roll your stats.
+    //                     You rolled a ${attributes.stats[0]} for strength, a ${attributes.stats[1]} for dexterity, a ${attributes.stats[2]} for constitution,
+    //                     a ${attributes.stats[3]} for intelligence, a ${attributes.stats[4]} for wisdom, and a ${attributes.stats[5]} for charisma. `
     
     
-    const expositionText =  `You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
-                            The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
-                            All maps have been lost but you are a brave ${attributes.char_class} and aren’t one to back down from a Challenge.
-                            Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
-                            Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
-                            As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
-                            As you’re about to choose you see a shadow across the right path. What do you do? </speak>`
+    // const expositionText =  `You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name.
+    //                         The witch queen's forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer.
+    //                         All maps have been lost but you are a brave ${attributes.char_class} and aren’t one to back down from a Challenge.
+    //                         Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around.
+    //                         Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. 
+    //                         As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor.
+    //                         As you’re about to choose you see a shadow across the right path. What do you do? </speak>`
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -139,12 +140,49 @@ const LeftHandler = {
       const speechText = 'You choose the left Path, as you walk down it the path leads to another circular room seemingly empty. ' +
       'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
       'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
-      attributes.ogreAsleep = 0;
-      //attributes.ogreStats = rollStats(4);
-      //attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
+      attributes.lastPos = 'left';
+      
     } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
       //ogre awake but not dead
       //dex to dodge attacks
+    } else if(attributes.ogreAlive === 0){
+      //ogre dead
+      //return 
+      attributes.lastPos = 'left'
+      handlerInput.attributesManager.setSessionAttributes(attributes);
+      return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+    }
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt('Attack the ogre or flee?')
+      .getResponse();
+  },
+};
+const AttackHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'AttackIntent';
+  },
+  handle(handlerInput) {
+    // Get the session attributes, get the name from the attributes
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const lastPos = attributes.lastPos;
+    if (attributes.lastPos != 'left') {
+      return handlerInput.responseBuilder
+      .speak('You can\'t go left now!')
+      .getResponse();
+    } else if(attributes.ogreAsleep === 1){
+      attributes.ogreAsleep = 0;
+      attributes.ogreStats = rollStats(4);
+      attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
+    } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
+      //ogre awake but not dead
+      //dex to dodge attacks
+      attributes.ogreStats = rollStats(6);
+      attributes.ogreHP = diceRoll(4) * attributes.ogreStats[0];
     } else if(attributes.ogreAlive === 0){
       //ogre dead
       //return 
@@ -155,7 +193,7 @@ const LeftHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('Attack the ogre or flee?')
+      .reprompt('Attack the ogre again or flee?')
       .getResponse();
   },
 };
@@ -272,6 +310,7 @@ exports.handler = skillBuilder
     RaceHandler,
     ClassHandler,
     LeftHandler,
+    AttackHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
