@@ -9,6 +9,7 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     const speechText = 'Welcome to Dungeons! What is your name, Adventurer?';
+    
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -25,6 +26,11 @@ const NameHandler = {
   },
   handle(handlerInput) {
     var name = this.event.request.intent.slots.name.value;
+    //save name into attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    attributes.name = name;
+    handlerInput.attributeManager.setSessionAttributes(attributes);
+
     const speechText = 'Welcome to the world ' + name + '! What is your race? You may be a human, a dwarf or an elf.';
 
     return handlerInput.responseBuilder
