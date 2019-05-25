@@ -26,8 +26,8 @@ const NameHandler = {
   handle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     var name = request.intent.slots.name.value;
-    //save name into attributes
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    // Save name into attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
@@ -82,13 +82,13 @@ const ClassHandler = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     // Get the user's race from the utterance
-    var char_class = request.intent.slots.class.value;
+    var char_class = request.intent.slots.char_class.value;
 
     // Save the race into the attributes
     attributes.char_class = char_class;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    attributes = rollStats(attributes, 12);
+    attributes.stats = rollStats(attributes, 12);
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
@@ -186,7 +186,9 @@ function rollStats(attributes, diceSides){
     con--;
     str--;
   }
-  return attributes;
+
+  stats = [str, dex, con, int, wis, cha]
+  return stats;
 }
 
 // Roll a dice of n sides
