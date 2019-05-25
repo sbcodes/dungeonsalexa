@@ -88,7 +88,7 @@ const ClassHandler = {
     attributes.char_class = char_class;
     // Roll the stats and save it into the attributes
     attributes.stats = rollStats(attributes, 6);  //cap to 7?
-
+    speechText = char_class;
     attributes.lastPos = 'entrance roll dice';
     attributes.PCHP = diceRoll(4) * attributes.stats[2];
     attributes.ogreAsleep = 1;
@@ -97,6 +97,7 @@ const ClassHandler = {
     attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
     attributes.hasKey = 0;
+    attributes.goblinAlive = 1;
     if(attributes.char_class === 'warrior'){
       attributes.damageDice = 6;
     } else{
@@ -177,72 +178,93 @@ const AttackHandler = {
     // Get the session attributes, get the name from the attributes
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
-    if (attributes.lastPos != 'left') {
+    if (attributes.lastPos != 'left' || attributes.lastPos != 'middle') {
       return handlerInput.responseBuilder
-      .speak('There is not ogre here to fight!')
-      .getResponse();
-    } else if(attributes.ogreAsleep === 1){
-      attributes.ogreAsleep = 0;
-      attributes.ogreStats = rollStats(4);
-      attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
-    } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
-      //ogre awake but not dead
-      //dex to dodge attacks
-      attributes.ogreStats = rollStats(6);
-      attributes.ogreHP = diceRoll(4) * attributes.ogreStats[0];
-    } else if(attributes.ogreAlive === 0){
-      //ogre dead
-      //return 
-      return handlerInput.responseBuilder
-      .speak('The ogre has already perished')
+      .speak('There is not enemy here to fight!')
       .getResponse();
     }
-    // var r = diceRoll(8);
-    // if(r >= attributes.ogreStats[1]){
-    //   //attack hits
-    //   var d = rollDice(attributes.damageDice);
-    //   speechText('Your attack hits for ' + d);
-    //   attributes.ogreHP - d;
-    // } else{
-    //   speechText('Your attack missed');
-    // }
-    // r = diceRoll(8);
-    // if(r >= attributes.ogreStats[1]){
-    //   //attack hits
-    //   var d = rollDice(attributes.damageDice);
-    //   speechText('Your attack hits for ' + d);
-    //   attributes.ogreHP - d;
-    // } else{
-    //   speechText('Your attack missed');
-    // }
-
-    //player attacks
-    var dam = attack(attributes);
-    if(dam > 0){
-      speechText = 'Your attack hits the ogre for ' + dam + ' damage';
-      attributes.ogreHP -= dam;
-    } else{
-      speechText = 'Your attack missed. ';
+    else if(attributes.lastPos === 'middle'){
+      if(attributes.ogreAsleep === 1){
+        attributes.ogreAsleep = 0;
+        attributes.ogreStats = rollStats(4);
+        attributes.ogreHP = diceRoll(2) * attributes.ogreStats[0];
+      } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
+        //ogre awake but not dead
+        //dex to dodge attacks
+        attributes.ogreStats = rollStats(6);
+        attributes.ogreHP = diceRoll(4) * attributes.ogreStats[0];
+      } else if(attributes.ogreAlive === 0){
+        //ogre dead
+        //return 
+        return handlerInput.responseBuilder
+        .speak('The ogre has already perished')
+        .getResponse();
+      }
+  
+      //player attacks
+      var dam = attack(attributes);
+      if(dam > 0){
+        speechText = 'Your attack hits the ogre for ' + dam + ' damage';
+        attributes.ogreHP -= dam;
+      } else{
+        speechText = 'Your attack missed. ';
+      }
+      //enemy attacks
+      dam = oAttack(attributes);
+      if(dam > 0){
+        speechText = 'The Ogre hits you for ' + dam + ' damage. ';
+        attributes.PCHP -= dam;
+      } else{
+        speechText = 'The ogres attack whiffed. ';
+      }
+      if(attributes.ogreHP <= 0){
+        attributes.ogreAlive = 0;
+        handlerInput.attributesManager.setSessionAttributes(attributes);
+        speechText = 'The ogre is slain. ';
+        return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+      }
     }
-    //enemy attacks
-    dam = oAttack(attributes);
-    if(dam > 0){
-      speechText = 'The Ogre hits you for ' + dam + ' damage';
-      attributes.PCHP -= dam;
-    } else{
-      speechText = 'The ogres attack whiffed. ';
-    }
-    if(attributes.ogreHP <= 0){
-      attributes.ogreAlive = 0;
-      speechText = 'The ogre is slain. You have received a torch and ';
-      return handlerInput.responseBuilder
-      .speak(speechText)
-      .getResponse();
+    else if(attributes.lastPos === 'left'){
+      if(goblinAlive === 1){
+        attributes.goblinStats = rollStatsEnemy(3);
+        attributes.goblinHP = rollDice(2) * goblinStats[0];
+        //player attacks
+      var dam = attack(attributes);
+      if(dam > 0){
+        speechText = 'Your attack hits the goblin for ' + dam + ' damage';
+        attributes.goblinHP -= dam;
+      } else{
+        speechText = 'Your attack missed. ';
+      }
+      //enemy attacks
+      dam = oAttack(attributes);
+      if(dam > 0){
+        speechText = 'The goblin hits you for ' + dam + ' damage. ';
+        attributes.PCHP -= dam;
+      } else{
+        speechText = 'The goblin\'s attack whiffed. ';
+      }
+      if(attributes.goblinHP <= 0){
+        attributes.goblinAlive = 0;
+        handlerInput.attributesManager.setSessionAttributes(attributes);
+        speechText = 'The goblin is slain. ';
+        return handlerInput.responseBuilder
+        .speak(speechText)
+        .getResponse();
+      }
+      } else{
+        return handlerInput.responseBuilder
+        .speak('The goblin has already perished')
+        .getResponse();
+      }
+      
     }
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('Attack the ogre again or flee?')
+      .reprompt('Attack again or flee?')
       .getResponse();
   },
 };
