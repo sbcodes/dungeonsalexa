@@ -8,7 +8,7 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = 'Welcome to Dungeons! What is your name, Adventurer?';
+    const speechText = '<speak>Welcome to Dungeons! What is your name Adventurer?</speak>';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -24,7 +24,13 @@ const NameHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'NameIntent';
   },
   handle(handlerInput) {
-    var name = this.event.request.intent.slots.name.value;
+    const request = handlerInput.requestEnvelope.request;
+    var name = request.intent.slots.name.value;
+    // Save name into attributes
+    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    attributes.name = name;
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+
     const speechText = 'Welcome to the world ' + name + '! What is your race? You may be a human, a dwarf or an elf.';
 
     return handlerInput.responseBuilder
@@ -42,7 +48,8 @@ const RaceHandler = {
   },
   handle(handlerInput) {
     // Get the session attributes, get the name from the attributes
-    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const name = attributes.name;
 
     // Get the user's race from the utterance
@@ -50,7 +57,7 @@ const RaceHandler = {
 
     // Save the race into the attributes
     attributes.race = race;
-    handlerInput.attributeManager.setSessionAttributes(attributes);
+    handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
     const speechText = 'What class are you,' + name + '? Are you a rogue, or a warrior?';
@@ -70,19 +77,23 @@ const ClassHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'ClassIntent';
   },
   handle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
     // Get the session attributes, get the name from the attributes
-    const attributes = handlerInput.attributeManager.getSessionAttributes();
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     // Get the user's race from the utterance
-    var char_class = this.event.request.intent.slots.class.value;
+    var char_class = request.intent.slots.char_class.value;
 
     // Save the race into the attributes
     attributes.char_class = char_class;
-    handlerInput.attributeManager.setSessionAttributes(attributes);
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+
+    attributes.stats = rollStats(attributes, 12);
+    handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
     const speechText = 'Okay, we will now roll your stats.';
-    const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.class;
+    const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.char_class;
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -150,8 +161,34 @@ const ErrorHandler = {
 const skillBuilder = Alexa.SkillBuilders.custom();
 
 // Roll the user's stats
-function rollStats(){
+function rollStats(attributes, diceSides){
+  var str = diceRoll(diceSides);
+  var dex = diceRoll(diceSides);
+  var con = diceRoll(diceSides);
+  var int = diceRoll(diceSides);
+  var wis = diceRoll(diceSides);
+  var cha = diceRoll(diceSides);
+  if(attributes.race === 'Human'){
+    str++;
+    dex++;
+    con++;
+    int++;
+    wis++;
+    cha++;
+  } else if(attributes.race === 'Dwarf'){
+    str += 2;
+    con += 2;
+    wis--;
+    cha--;
+  } else if(attributes.race === 'Elf'){
+    dex += 2;
+    int += 2;
+    con--;
+    str--;
+  }
 
+  stats = [str, dex, con, int, wis, cha]
+  return stats;
 }
 
 // Roll a dice of n sides

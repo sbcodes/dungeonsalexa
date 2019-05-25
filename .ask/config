@@ -1,0 +1,33 @@
+{
+  "deploy_settings": {
+    "default": {
+      "skill_id": "amzn1.ask.skill.af6dcd27-c792-4085-90a9-46a38784dc7e",
+      "was_cloned": false,
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "451c0bf8cda2accbb9234b13672a7d88"
+        },
+        "interactionModel": {
+          "en-US": {
+            "eTag": "777f39fd5bb54113a21a01ecba3174f7"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:741529077213:function:ask-custom-dungeons-alexa-default",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-dungeons-alexa-default",
+            "handler": "index.handler",
+            "revisionId": "92284510-6dba-4600-a0d1-b3c2e98efabd",
+            "runtime": "nodejs8.10"
+          }
+        ]
+      }
+    }
+  }
+}
