@@ -325,7 +325,9 @@ const RightHandler = {
                     Behind the boulder is a secret room. You notice an open chest in front of you.
                     Inside the chest, you find a golden key. Wondering what to do with it, you head back to the dungeon entrance to find a use for the key. 
                     Now where do you go? To the left, the middle, or the right?`;
+      // Set the correct attributes
       attributes.boulderPushed = 1;
+      attributes.hasKey = 1;
     } else if(attributes.boulderPushed === 1){
       speechText = `You have been here already found the mysterious key in the chest.`;
     }
