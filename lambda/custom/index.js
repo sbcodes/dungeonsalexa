@@ -31,7 +31,7 @@ const NameHandler = {
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    const speechText = 'Welcome to the world ' + name + '! What is your race? You may be a human, a dwarf or an elf.';
+    const speechText = 'Welcome to the world ' + name + '! What is your race? Are you a human, a dwarf, or an elf.';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -86,18 +86,29 @@ const ClassHandler = {
 
     // Save the race into the attributes
     attributes.char_class = char_class;
-    handlerInput.attributesManager.setSessionAttributes(attributes);
-
+    // Roll the stats and save it into the attributes
     attributes.stats = rollStats(attributes, 12);
+
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText = 'Okay, we will now roll your stats.';
-    const dataText = 'Your name is ' + attributes.name + ', your race is ' + attributes.race + ', your class is ' + attributes.char_class;
+    const speechText =  '<speak>Okay, ' + char_class + ', we will now roll your stats. ' +
+                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        'You rolled a ' + String.valueOf(stats[0]) + ' for strength. ' +
+                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        'You rolled a ' + String.valueOf(stats[1]) + ' for dexterity. ' +
+                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        'You rolled a ' + String.valueOf(stats[2]) + ' for constitution. ' +
+                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        'You rolled a ' + String.valueOf(stats[3]) + ' for intelligence. ' +
+                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        'You rolled a ' + String.valueOf(stats[4]) + ' for wisdom. ' +
+                        '<audio src=\'http://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3\'>' +
+                        'You rolled a ' + String.valueOf(stats[5]) + ' for charisma.';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
-      .speak(speechText + dataText)
+      .speak(speechText);
   },
 };
 
