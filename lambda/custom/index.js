@@ -270,6 +270,12 @@ const AttackHandler = {
       if(dam > 0){
         speechText = 'The Ogre hits you for ' + dam + ' damage. ';
         attributes.PCHP -= dam;
+        if(attributes.PCHP <= 0){
+          speechText = 'You have died';
+          return handlerInput.responseBuilder
+          .speak(speechText)
+          .getResponse();
+        }
       } else{
         speechText = 'The ogres attack whiffed. ';
       }
@@ -304,6 +310,12 @@ const AttackHandler = {
         if(dam > 0){
           speechText = 'The goblin hits you for ' + dam + ' damage. ';
           attributes.PCHP -= dam;
+          if(attributes.PCHP <= 0){
+            speechText = 'You have died';
+            return handlerInput.responseBuilder
+            .speak(speechText)
+            .getResponse();
+          }
         } else{
           speechText = 'The goblin\'s attack whiffed. ';
         }
