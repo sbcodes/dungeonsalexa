@@ -158,7 +158,6 @@ const MiddleHandler = {
         //ogre dead
         //return
         attributes.lastPos = 'middle'
-
       }
     } else{
       //too dark
@@ -188,7 +187,7 @@ const RightHandler = {
                     Using your level ${attributes.stats[0]} strength, you push the boulder out of your way.
                     Behind the boulder is a secret room. You notice an open chest in front of you.
                     Inside the chest, you find a golden key. Wondering what to do with it, you head back to the dungeon entrance to find a use for the key. 
-                    Now where do you go? To the left, the middle, or the right?`;
+                    Now where do you go? To the left, or the middle?`;
       // Set the correct attributes
       attributes.boulderPushed = 1;
       attributes.hasKey = 1;
@@ -200,7 +199,36 @@ const RightHandler = {
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
-      .reprompt('What do you do?')
+      .reprompt('Where do you go?')
+      .getResponse();
+  },
+};
+
+const LeftHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'LeftIntent';
+  },
+  handle(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    // Get the session attributes, get the name from the attributes
+    const lastPos = attributes.lastPos;
+    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
+      speechText = 'You can\'t go left now!';
+    } else {
+      speechText =  'You go down the left corridor. In the distance you see a goblin who has a torch.' +
+                    'He attacks you but since you are an experienced ' + attributes.char_class + ' and are able to defend yourself against his attack. ' +
+                    'After a long struggle, you finally kill him and you take his torch in order to help guide your way through the rest of the dungeon. ' +
+                    'You go back to the dungeon entrance. Do you go to the left, or to the right?';
+      // Set the correct attributes
+      attributes.hasTorch = 1;
+    }
+    attributes.lastPos = 'left'
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+    return handlerInput.responseBuilder
+      // Ask for the user's class
+      .speak(speechText)
+      .reprompt('Where do you go?')
       .getResponse();
   },
 };
