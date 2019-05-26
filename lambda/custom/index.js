@@ -503,6 +503,7 @@ exports.handler = skillBuilder
     RightHandler,
     LeftHandler,
     LightTorchHandler,
+    LeftHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
