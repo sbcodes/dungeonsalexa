@@ -280,31 +280,32 @@ const AttackHandler = {
         speechText = 'Your attack hits the ogre for ' + dam + ' damage';
         attributes.ogreHP -= dam;
       } else{
-        speechText = 'Your attack missed. ';
+        speechText += 'Your attack missed. ';
       }
       //enemy attacks
       dam = oAttack(attributes);
       if(dam > 0){
-        speechText = 'The Ogre hits you for ' + dam + ' damage. ';
+        speechText += 'The Ogre hits you for ' + dam + ' damage. ';
         attributes.PCHP -= dam;
         if(attributes.PCHP <= 0){
-          speechText = 'You have died';
+          speechText += 'You have died';
           return handlerInput.responseBuilder
           .speak(speechText)
           .getResponse();
         }
       } else{
-        speechText = 'The ogres attack whiffed. ';
+        speechText += 'The ogres attack whiffed. ';
       }
       if(attributes.ogreHP <= 0){
         attributes.ogreAlive = 0;
         handlerInput.attributesManager.setSessionAttributes(attributes);
         speechText = 'The ogre is slain. ';
         if(attributes.hasKey === 0){
-          speechText = 'You notice a door but it is locked.';
+          speechText += 'You notice a door but it is locked.';
         } else{
-          speechText = 'You notice a door and unlock it with your key. The End';
+          speechText += 'You notice a door and unlock it with your key. The End';
         }
+        speechText += 'You may attack again.';
         return handlerInput.responseBuilder
         .speak(speechText)
         .getResponse();
@@ -350,8 +351,8 @@ const AttackHandler = {
         .speak('The goblin has already perished')
         .getResponse();
       }
-      
     }
+    speechText += 'You may attack again.';
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
