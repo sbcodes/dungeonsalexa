@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-dungeons-alexa-default",
             "handler": "index.handler",
-            "revisionId": "ee275048-b6db-47b3-b089-95a78c116796",
+            "revisionId": "f550f067-4739-4bb3-9903-14a752d550a8",
             "runtime": "nodejs8.10"
           }
         ]
