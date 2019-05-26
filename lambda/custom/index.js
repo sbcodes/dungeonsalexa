@@ -170,6 +170,26 @@ const MiddleHandler = {
       .getResponse();
   },
 };
+const LightTorchHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'LightTorchIntent';
+  },
+  handle(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    attributes.litTorch = 1;
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+
+    // Ask for the class
+    const speechText = 'You light your torch';
+
+    return handlerInput.responseBuilder
+      // Ask for the user's class
+      .speak(speechText)
+      .getResponse();
+  },
+};
+
 const AttackHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -449,6 +469,7 @@ exports.handler = skillBuilder
     MiddleHandler,
     AttackHandler,
     RightHandler,
+    LightTorchHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
