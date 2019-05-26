@@ -308,6 +308,7 @@ const AttackHandler = {
         } else{
           speechText = 'You notice a door and unlock it with your key. You find yourself in a large strange room.</voice></speak>';
         }
+        speechText += 'You may attack again.';
         return handlerInput.responseBuilder
         .speak(speechText)
         .getResponse();
@@ -353,8 +354,8 @@ const AttackHandler = {
         .speak('The goblin has already perished')
         .getResponse();
       }
-      
     }
+    speechText += 'You may attack again.';
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
