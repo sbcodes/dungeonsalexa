@@ -31,7 +31,7 @@ const NameHandler = {
     attributes.name = name;
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    const speechText = 'Welcome to Fantasy Land ' + name + '! What is your race? Are you a human, a dwarf, or an elf. ';
+    const speechText = '<speak><voice name="Matthew">Welcome to Fantasy Land ' + name + '! What is your race? Are you a human, a dwarf, or an elf?</voice></speak>';
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -60,7 +60,7 @@ const RaceHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText = 'What class are you, ' + name + ' the ' + race + '? Are you a rogue, or a warrior?';
+    const speechText = '<speak><voice name="Matthew">What class are you, ' + name + ' the ' + race + '? Are you a rogue, or a warrior?</voice></speak>';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -106,16 +106,12 @@ const ClassHandler = {
       attributes.damageDice = 4;
     }
     const speechText =
-    'Okay, ' + name + ', we will now roll your stats. ' + 
+    '<speak><voice name="Matthew">Okay, ' + name + ', we will now roll your stats. ' + 
+    '<audio src="https://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3"/> ' +
     'You rolled a ' + attributes.stats[0] + ' for strength, a ' + attributes.stats[1] + ' for dexterity, a ' + attributes.stats[2] + ' for constitution, ' +
     'a ' + attributes.stats[3] + ' for intelligence, a ' + attributes.stats[4] + ' for wisdom, and a ' + attributes.stats[5] + ' for charisma. ' +
-    'You have been tasked by the Great King Galaxathon to explore the dark dingy Dungeon of the recently defeated Queen Rosaline Blackwine, the worst of her name. ' +
-    'The witch queen\'s forces were decimated in the war of the Black Scar however rumours swirl that there are still monsters inhabiting her Dungeon. Tread with Caution Adventurer. ' +
-    'All maps have been lost but you are a brave ' + attributes.char_class + ' and aren’t one to back down from a Challenge. ' +
-    'Tread forth into the dungeon and retrieve the legendary treasure said to be hidden in the depths. You arrive at the dungeon entrance, a huge looming black Arch casting a long dark shadow compared to the light forest around. ' +
-    'Heading down the stairs, you forget how long you’ve been going down until after what seems like half an hour you slowly see a light growing brighter. ' +
-    'As you enter the dimly lit circular room, the light coming from a great fire up above. In front of you there are three corridors, to the left a brightly lit corridor, in the middle a pitch black corridor and to the right another brightly lit corridor. ' +
-    'As you’re about to choose you see a shadow across the right path. What do you do?';
+    '<break time = "1s"/><audio src="https://s3.amazonaws.com/hackathonalexa2019/Intro.mp3"/>' +
+    '</voice></speak>';
     attributes.testText = speechText;
 
     handlerInput.attributesManager.setSessionAttributes(attributes);
@@ -141,9 +137,10 @@ const MiddleHandler = {
     const lastPos = attributes.lastPos;
     if(attributes.litTorch === 1){
       if(attributes.ogreAsleep === 1){
-        const speechText = 'You choose the middle Path, as you walk down it the path leads to another circular room seemingly empty. ' +
+        const speechText = '<speak><voice name="Matthew">You choose the middle Path. It leads to another seemingly empty circular room. ' +
         'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
-        'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?';
+        'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?' +
+        '</speak></voice>';
         attributes.lastPos = 'middle';
         
       } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
@@ -158,7 +155,7 @@ const MiddleHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('Attack the ogre or flee?')
+      .reprompt('Do you ttack the ogre or flee?')
       .getResponse();
   },
 };
@@ -173,18 +170,18 @@ const RightHandler = {
     // Get the session attributes, get the name from the attributes
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
-      speechText = 'You can\'t go right now!';
+      speechText = '<speak><voice name="Matthew">You can\'t go right now!</voice></speak>';
     } else if(attributes.boulderPushed === 0){
-      speechText = `You walk through the right corridor until you come accross a huge boulder blocking your path.
+      speechText = `<speak><voice name="Matthew">You walk through the right corridor until you come accross a huge boulder blocking your path.
                     Using your level ${attributes.stats[0]} strength, you push the boulder out of your way.
                     Behind the boulder is a secret room. You notice an open chest in front of you.
                     Inside the chest, you find a golden key. Wondering what to do with it, you head back to the dungeon entrance to find a use for the key. 
-                    Now where do you go? To the left, or the middle?`;
+                    Now where do you go? To the left, or the middle?</voice></speak>`;
       // Set the correct attributes
       attributes.boulderPushed = 1;
       attributes.hasKey = 1;
     } else if(attributes.boulderPushed === 1){
-      speechText = `You have been here already found the mysterious key in the chest.`;
+      speechText = `<speak><voice name="Matthew">You have been here already found the mysterious key in the chest.</voice></speak>`;
     }
     attributes.lastPos = 'right corridor'
     handlerInput.attributesManager.setSessionAttributes(attributes);
@@ -206,12 +203,12 @@ const LeftHandler = {
     // Get the session attributes, get the name from the attributes
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
-      speechText = 'You can\'t go left now!';
+      speechText = '<speak><voice name="Matthew">You can\'t go left now!</voice></speak>';
     } else {
-      speechText =  'You go down the left corridor. In the distance you see a goblin who has a torch.' +
+      speechText =  '<speak><voice name="Matthew">You go down the left corridor. In the distance you see a goblin who has a torch.' +
                     'He attacks you but since you are an experienced ' + attributes.char_class + ' and are able to defend yourself against his attack. ' +
                     'After a long struggle, you finally kill him and you take his torch in order to help guide your way through the rest of the dungeon. ' +
-                    'You go back to the dungeon entrance. Do you go to the left, or to the right?';
+                    'You go back to the dungeon entrance. Do you go to the left, or to the right?</voice></speak>';
       // Set the correct attributes
       attributes.hasTorch = 1;
     }
