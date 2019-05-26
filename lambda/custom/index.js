@@ -280,33 +280,33 @@ const AttackHandler = {
       //player attacks
       var dam = attack(attributes);
       if(dam > 0){
-        speechText = '<speak><voice name="Matthew">Your attack hits the ogre for ' + dam + ' damage</voice></speak>';
+        speechText += '<speak><voice name="Matthew">Your attack hits the ogre for ' + dam + ' damage</voice></speak>';
         attributes.ogreHP -= dam;
       } else{
-        speechText = '<speak><voice name="Matthew">Your attack missed. </voice></speak>';
+        speechText += '<speak><voice name="Matthew">Your attack missed. </voice></speak>';
       }
       //enemy attacks
       dam = oAttack(attributes);
       if(dam > 0){
-        speechText = '<speak><voice name="Matthew">The Ogre hits you for ' + dam + ' damage. </voice></speak>';
+        speechText += '<speak><voice name="Matthew">The Ogre hits you for ' + dam + ' damage. </voice></speak>';
         attributes.PCHP -= dam;
         if(attributes.PCHP <= 0){
-          speechText = '<speak><voice name="Matthew">You have died</voice></speak>';
+          speechText += '<speak><voice name="Matthew">You have died</voice></speak>';
           return handlerInput.responseBuilder
           .speak(speechText)
           .getResponse();
         }
       } else{
-        speechText = '<speak><voice name="Matthew">The ogres attack whiffed.</voice></speak>';
+        speechText += '<speak><voice name="Matthew">The ogres attack whiffed.</voice></speak>';
       }
       if(attributes.ogreHP <= 0){
         attributes.ogreAlive = 0;
         handlerInput.attributesManager.setSessionAttributes(attributes);
-        speechText = '<speak><voice name="Matthew">The ogre is slain.</voice></speak>';
+        speechText += '<speak><voice name="Matthew">The ogre is slain.</voice></speak>';
         if(attributes.hasKey === 0){
-          speechText = '<speak><voice name="Matthew">You notice a door but it is locked.';
+          speechText += '<speak><voice name="Matthew">You notice a door but it is locked.</voice></speak>';
         } else{
-          speechText = 'You notice a door and unlock it with your key. You find yourself in a large strange room.</voice></speak>';
+          speechText += 'You notice a door and unlock it with your key. You find yourself in a large strange room.</voice></speak>';
         }
         speechText += 'You may attack again.';
         return handlerInput.responseBuilder
@@ -324,27 +324,27 @@ const AttackHandler = {
           speechText = 'Your attack hits the goblin for ' + dam + ' damage';
           attributes.goblinHP -= dam;
         } else{
-          speechText = 'Your attack missed. ';
+          speechText += 'Your attack missed. ';
         }
         //enemy attacks
         dam = oAttack(attributes);
         if(dam > 0){
-          speechText = 'The goblin hits you for ' + dam + ' damage. ';
+          speechText += 'The goblin hits you for ' + dam + ' damage. ';
           attributes.PCHP -= dam;
           if(attributes.PCHP <= 0){
-            speechText = 'You have died';
+            speechText += 'You have died';
             return handlerInput.responseBuilder
             .speak(speechText)
             .getResponse();
           }
         } else{
-          speechText = 'The goblin\'s attack whiffed. ';
+          speechText += 'The goblin\'s attack whiffed. ';
         }
         if(attributes.goblinHP <= 0){
           attributes.goblinAlive = 0;
           attributes.lastPos = 'goblin';
           handlerInput.attributesManager.setSessionAttributes(attributes);
-          speechText = 'The goblin is slain. ';
+          speechText += 'The goblin is slain. ';
           return handlerInput.responseBuilder
           .speak(speechText)
           .getResponse();
