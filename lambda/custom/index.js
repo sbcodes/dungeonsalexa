@@ -8,11 +8,11 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = '<speak>Welcome to Dungeons! What is your name Adventurer?</speak>';
+    const speechText = '<speak><voice name="Matthew">Welcome to Dungeons! What is your name Adventurer?</voice></speak>';
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt("Speak your name Adventurer. ")
+      .reprompt('<speak><voice name="Matthew">Speak your name Adventurer.</voice></speak>')
       .withSimpleCard('Welcome', speechText)
       .getResponse();
   },
@@ -35,7 +35,7 @@ const NameHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('What is your character\'s race? ')
+      .reprompt('<speak><voice name="Matthew">What is your character\'s race?</voice></speak>')
       .withSimpleCard('Name Selection', speechText)
       .getResponse();
   },
@@ -111,14 +111,14 @@ const ClassHandler = {
     'You rolled a ' + attributes.stats[0] + ' for strength, a ' + attributes.stats[1] + ' for dexterity, a ' + attributes.stats[2] + ' for constitution, ' +
     'a ' + attributes.stats[3] + ' for intelligence, a ' + attributes.stats[4] + ' for wisdom, and a ' + attributes.stats[5] + ' for charisma. ' +
     '<break time = "1s"/><audio src="https://s3.amazonaws.com/hackathonalexa2019/Intro.mp3"/>' +
-    '</voice></speak>';
+    'Now my friend. Where will you choose to go? To the left, down the middle, or to the right?</voice></speak>';
     attributes.testText = speechText;
 
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
-      .reprompt('Do you go left, right or down the middle?')
+      .reprompt('<speak><voice name="Matthew">Do you go left, right or down the middle?</voice></speak>')
       .withSimpleCard('Name Selection', speechText)
       .getResponse();
   },
@@ -135,12 +135,13 @@ const MiddleHandler = {
     // Get the session attributes, get the name from the attributes
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
+    var speechText = ""
     if(attributes.litTorch === 1){
       if(attributes.ogreAsleep === 1){
-        const speechText = '<speak><voice name="Matthew">You choose the middle Path. It leads to another seemingly empty circular room. ' +
+        speechText = '<speak><voice name="Matthew">You choose the middle Path. It leads to another seemingly empty circular room. ' +
         'As you step into the room you notice a Huge Sleeping Ogre to the left and you Freeze, hoping he won’t wake up. ' +
         'As you slowly step back the noise of your boots rouses the Ogre, grogy with sleep he hasn’t noticed you yet. Do you: Attack or Retreat?' +
-        '</speak></voice>';
+        '</voice></speak>';
         attributes.lastPos = 'middle';
         
       } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
@@ -149,13 +150,15 @@ const MiddleHandler = {
         attributes.lastPos = 'entrance'
       }
     } else{
-      //too dark
+      speechText =  '<speak><voice name="Matthew">You make your way down the path but it gets too dark for you to see. ' +
+                    'You decide to turn around and try to find another way through the dungeon. You make your way back to the dungeon entrance. ' + 
+                    'Now do you go left, or right?</voice></speak>';
     }
     
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('Do you ttack the ogre or flee?')
+      .reprompt('<speak><voice name="Matthew">Do you attack the ogre or flee?</voice></speak>')
       .getResponse();
   },
 };
@@ -217,7 +220,7 @@ const LeftHandler = {
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
-      .reprompt('Where do you go?')
+      .reprompt('<speak><voice name="Matthew">Where do you go?</voice></speak>')
       .getResponse();
   },
 };
@@ -233,7 +236,7 @@ const LightTorchHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
 
     // Ask for the class
-    const speechText = 'You light your torch';
+    const speechText = '<speak><voice name="Matthew">You light your torch</voice></speak>';
 
     return handlerInput.responseBuilder
       // Ask for the user's class
@@ -253,7 +256,7 @@ const AttackHandler = {
     const lastPos = attributes.lastPos;
     if (attributes.lastPos != 'left' || attributes.lastPos != 'middle') {
       return handlerInput.responseBuilder
-      .speak('There is not enemy here to fight!')
+      .speak('<speak><voice name="Matthew">There is no enemy here to fight!</voice></speak>')
       .getResponse();
     }
     else if(attributes.lastPos === 'middle'){
@@ -277,33 +280,33 @@ const AttackHandler = {
       //player attacks
       var dam = attack(attributes);
       if(dam > 0){
-        speechText = 'Your attack hits the ogre for ' + dam + ' damage';
+        speechText = '<speak><voice name="Matthew">Your attack hits the ogre for ' + dam + ' damage</voice></speak>';
         attributes.ogreHP -= dam;
       } else{
-        speechText = 'Your attack missed. ';
+        speechText = '<speak><voice name="Matthew">Your attack missed. </voice></speak>';
       }
       //enemy attacks
       dam = oAttack(attributes);
       if(dam > 0){
-        speechText = 'The Ogre hits you for ' + dam + ' damage. ';
+        speechText = '<speak><voice name="Matthew">The Ogre hits you for ' + dam + ' damage. </voice></speak>';
         attributes.PCHP -= dam;
         if(attributes.PCHP <= 0){
-          speechText = 'You have died';
+          speechText = '<speak><voice name="Matthew">You have died</voice></speak>';
           return handlerInput.responseBuilder
           .speak(speechText)
           .getResponse();
         }
       } else{
-        speechText = 'The ogres attack whiffed. ';
+        speechText = '<speak><voice name="Matthew">The ogres attack whiffed.</voice></speak>';
       }
       if(attributes.ogreHP <= 0){
         attributes.ogreAlive = 0;
         handlerInput.attributesManager.setSessionAttributes(attributes);
-        speechText = 'The ogre is slain. ';
+        speechText = '<speak><voice name="Matthew">The ogre is slain.</voice></speak>';
         if(attributes.hasKey === 0){
-          speechText = 'You notice a door but it is locked.';
+          speechText = '<speak><voice name="Matthew">You notice a door but it is locked.';
         } else{
-          speechText = 'You notice a door and unlock it with your key. The End';
+          speechText = 'You notice a door and unlock it with your key. You find yourself in a large strange room.</voice></speak>';
         }
         return handlerInput.responseBuilder
         .speak(speechText)
@@ -355,7 +358,7 @@ const AttackHandler = {
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt('Attack again or flee?')
+      .reprompt('<speak><voice name="Matthew">Attack or flee?</voice></speak>')
       .getResponse();
   },
 };
@@ -386,7 +389,7 @@ const CancelAndStopIntentHandler = {
   },
   handle(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const speechText = `Goodbye ${attributes.name}`;
+    const speechText = `Farewell, adventurer ${attributes.name}`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
