@@ -139,11 +139,6 @@ const MiddleHandler = {
     // Get the session attributes, get the name from the attributes
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
-    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
-      return handlerInput.responseBuilder
-      .speak('You can\'t go middle now!')
-      .getResponse();
-    }
     if(attributes.litTorch === 1){
       if(attributes.ogreAsleep === 1){
         const speechText = 'You choose the middle Path, as you walk down it the path leads to another circular room seemingly empty. ' +
@@ -152,12 +147,9 @@ const MiddleHandler = {
         attributes.lastPos = 'middle';
         
       } else if(attributes.ogreAsleep === 0 && attributes.ogreAlive === 1){
-        //ogre awake but not dead
-        //dex to dodge attacks
+        attributes.lastPos = 'entrance';
       } else if(attributes.ogreAlive === 0){
-        //ogre dead
-        //return
-        attributes.lastPos = 'middle'
+        attributes.lastPos = 'entrance'
       }
     } else{
       //too dark
@@ -500,6 +492,7 @@ exports.handler = skillBuilder
     MiddleHandler,
     AttackHandler,
     RightHandler,
+    LeftHandler,
     LightTorchHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
