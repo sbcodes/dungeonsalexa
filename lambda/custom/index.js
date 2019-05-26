@@ -122,13 +122,14 @@ const ClassHandler = {
     return handlerInput.responseBuilder
       // Ask for the user's class
       .speak(speechText)
+      .reprompt('Do you go left, right or down the middle?')
+      .withSimpleCard('Name Selection', speechText)
       .getResponse();
   },
 };
 
 //Potential move of ogre to dark hallway and small enemy to fight for torch
 
-//barebones
 const MiddleHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -170,6 +171,40 @@ const MiddleHandler = {
       .getResponse();
   },
 };
+
+const RightHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'RightIntent';
+  },
+  handle(handlerInput) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    // Get the session attributes, get the name from the attributes
+    const lastPos = attributes.lastPos;
+    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
+      speechText = 'You can\'t go right now!';
+    } else if(attributes.boulderPushed === 0){
+      speechText = `You walk through the right corridor until you come accross a huge boulder blocking your path.
+                    Using your level ${attributes.stats[0]} strength, you push the boulder out of your way.
+                    Behind the boulder is a secret room. You notice an open chest in front of you.
+                    Inside the chest, you find a golden key. Wondering what to do with it, you head back to the dungeon entrance to find a use for the key. 
+                    Now where do you go? To the left, the middle, or the right?`;
+      // Set the correct attributes
+      attributes.boulderPushed = 1;
+      attributes.hasKey = 1;
+    } else if(attributes.boulderPushed === 1){
+      speechText = `You have been here already found the mysterious key in the chest.`;
+    }
+    attributes.lastPos = 'right corridor'
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+    return handlerInput.responseBuilder
+      // Ask for the user's class
+      .speak(speechText)
+      .reprompt('What do you do?')
+      .getResponse();
+  },
+};
+
 const AttackHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -277,38 +312,6 @@ const AttackHandler = {
 };
 //Chest could have trap on it that requires a wisdom check to notice and dex to disarm.
 
-const RightHandler = {
-  canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-      && handlerInput.requestEnvelope.request.intent.name === 'RightIntent';
-  },
-  handle(handlerInput) {
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
-    // Get the session attributes, get the name from the attributes
-    const lastPos = attributes.lastPos;
-    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
-      speechText = 'You can\'t go right now!';
-    } else if(attributes.boulderPushed === 0){
-      speechText = `You walk through the right corridor until you come accross a huge boulder blocking your path.
-                    Using your level ${attributes.stats[0]} strength, you push the boulder out of your way.
-                    Behind the boulder is a secret room. You notice an open chest in front of you.
-                    Inside the chest, you find a golden key. Wondering what to do with it, you head back to the dungeon entrance to find a use for the key. 
-                    Now where do you go? To the left, the middle, or the right?`;
-      // Set the correct attributes
-      attributes.boulderPushed = 1;
-      attributes.hasKey = 1;
-    } else if(attributes.boulderPushed === 1){
-      speechText = `You have been here already found the mysterious key in the chest.`;
-    }
-    attributes.lastPos = 'right corridor'
-    handlerInput.attributesManager.setSessionAttributes(attributes);
-    return handlerInput.responseBuilder
-      // Ask for the user's class
-      .speak(speechText)
-      .reprompt('What do you do?')
-      .getResponse();
-  },
-};
 
 const HelpIntentHandler = {
   canHandle(handlerInput) {
