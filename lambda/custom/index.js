@@ -97,7 +97,7 @@ const ClassHandler = {
     attributes.ogreDead = 0;
     attributes.boulderPushed = 0;
     attributes.hasTorch = 0;
-    attributes.litTorch = 0;
+    attributes.litTorch = 1;
     attributes.hasKey = 0;
     attributes.goblinAlive = 1;
     if(attributes.char_class === 'warrior'){
@@ -111,7 +111,7 @@ const ClassHandler = {
     'You rolled a ' + attributes.stats[0] + ' for strength, a ' + attributes.stats[1] + ' for dexterity, a ' + attributes.stats[2] + ' for constitution, ' +
     'a ' + attributes.stats[3] + ' for intelligence, a ' + attributes.stats[4] + ' for wisdom, and a ' + attributes.stats[5] + ' for charisma. ' +
     '<break time = "1s"/><audio src="https://s3.amazonaws.com/hackathonalexa2019/Intro.mp3"/>' +
-    'Now my friend. Where will you choose to go? To the left, down the middle, or to the right?</voice></speak>';
+    'Now my friend, you have arrived at the dungeon entrance. Where will you choose to go? To the left, down the middle, or to the right?</voice></speak>';
     attributes.testText = speechText;
 
     handlerInput.attributesManager.setSessionAttributes(attributes);
@@ -205,16 +205,16 @@ const LeftHandler = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     // Get the session attributes, get the name from the attributes
     const lastPos = attributes.lastPos;
-    if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
-      speechText = '<speak><voice name="Matthew">You can\'t go left now!</voice></speak>';
-    } else {
-      speechText =  '<speak><voice name="Matthew">You go down the left corridor. In the distance you see a goblin who has a torch.' +
-                    'He attacks you but since you are an experienced ' + attributes.char_class + ' and are able to defend yourself against his attack. ' +
+    // if (attributes.lastPos != 'entrance roll dice' && attributes.lastPos != 'entrance') {
+    //   speechText = '<speak><voice name="Matthew">You can\'t go left now!</voice></speak>';
+    // } else {
+      speechText =  '<speak><voice name="Matthew">You go down the left corridor. In the distance you see a goblin who has a torch. ' +
+                    'He attacks you but since you are an experienced ' + attributes.char_class + ', you are able to defend yourself against his attack. ' +
                     'After a long struggle, you finally kill him and you take his torch in order to help guide your way through the rest of the dungeon. ' +
-                    'You go back to the dungeon entrance. Do you go to the left, or to the right?</voice></speak>';
+                    'You go back to the dungeon entrance. Do you go to the right, or down the middle?</voice></speak>';
       // Set the correct attributes
       attributes.hasTorch = 1;
-    }
+    // }
     attributes.lastPos = 'left'
     handlerInput.attributesManager.setSessionAttributes(attributes);
     return handlerInput.responseBuilder
@@ -251,10 +251,11 @@ const AttackHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'AttackIntent';
   },
   handle(handlerInput) {
+    attributes.lastPos = 'middle';
     // Get the session attributes, get the name from the attributes
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const lastPos = attributes.lastPos;
-    if (attributes.lastPos != 'left' || attributes.lastPos != 'middle') {
+    if (false) {
       return handlerInput.responseBuilder
       .speak('<speak><voice name="Matthew">There is no enemy here to fight!</voice></speak>')
       .getResponse();
