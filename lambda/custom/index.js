@@ -107,7 +107,7 @@ const ClassHandler = {
     }
     const speechText =
     '<speak><voice name="Matthew">Okay, ' + name + ', we will now roll your stats. ' + 
-    '<audio src="https://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3"/> ' +
+    '<prosody volume="loud"><audio src="https://s3.amazonaws.com/hackathonalexa2019/Dice-Roll.mp3"/></prosody> ' +
     'You rolled a ' + attributes.stats[0] + ' for strength, a ' + attributes.stats[1] + ' for dexterity, a ' + attributes.stats[2] + ' for constitution, ' +
     'a ' + attributes.stats[3] + ' for intelligence, a ' + attributes.stats[4] + ' for wisdom, and a ' + attributes.stats[5] + ' for charisma. ' +
     '<break time = "1s"/><audio src="https://s3.amazonaws.com/hackathonalexa2019/Intro.mp3"/>' +
@@ -184,7 +184,7 @@ const RightHandler = {
       attributes.boulderPushed = 1;
       attributes.hasKey = 1;
     } else if(attributes.boulderPushed === 1){
-      speechText = `<speak><voice name="Matthew">You have been here already found the mysterious key in the chest.</voice></speak>`;
+      speechText = '<speak><voice name="Matthew">You have been here already found the mysterious key in the chest.</voice></speak>';
     }
     attributes.lastPos = 'right corridor'
     handlerInput.attributesManager.setSessionAttributes(attributes);
